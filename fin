@@ -1,0 +1,49 @@
+import telebot
+import datetime
+import types
+from telebot import types
+
+b = [] 
+b.clear()
+bot = telebot.TeleBot('1062693555:AAG72LzPMRWl_yTJBd-561grRz9cCltwDuc')
+
+
+
+@bot.message_handler(commands=["start"])
+
+def inline(message):
+    key = telebot.types.InlineKeyboardMarkup()
+    but_1 = telebot.types.InlineKeyboardButton(text="Пришел на работу", callback_data="Work")
+    but_2 = telebot.types.InlineKeyboardButton(text="Иду домой", callback_data="End_work")
+    but_3 = telebot.types.InlineKeyboardButton(text="Сколько работаю?", callback_data="How")
+    key.row(but_1, but_2)
+    key.row(but_3)
+    bot.send_message(message.chat.id, "ВЫБЕРИ КНОПКУ", reply_markup=key)
+
+
+@bot.callback_query_handler(func=lambda c:True)
+def inlin(c: types.CallbackQuery):
+    if c.data == 'Work':       
+        bot.send_message(c.message.chat.id, 'Привет, сейчас я засеку время работы.')
+        begin_time = datetime.datetime.now() 
+        b.append(begin_time)
+        bot.send_message(c.message.chat.id, "Начало работы: " + str(b[0])) 
+        
+    elif c.data == 'End_work':
+        end_time = datetime.datetime.now() 
+        b.append(end_time)
+        a = b[1]- b[0]
+        bot.send_message(c.message.chat.id, "Конец работы: " + str(end_time))
+        bot.send_message(c.message.chat.id, "Ты работал: " + str(a) )        
+        bot.send_message(c.message.chat.id, "Можешь снова нажать на /start")
+        b.clear()
+        
+        
+    elif c.data == 'How':
+        now = datetime.datetime.now() 
+        bot.send_message(c.message.chat.id, "Ты работал: " + str(now - b[0]))
+    
+        
+        
+    return b
+bot.polling(none_stop=True, interval=0)
